@@ -1,0 +1,34 @@
+FROM ubuntu:latest
+COPY . /home/spring_app
+
+LABEL maintainer="DucNV"
+LABEL build_date="2/22/2021"
+LABEL version="1.0"
+
+#install jdk 8
+RUN apt-get update
+RUN	apt-get install -y openjdk-8-jdk
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
+
+#insert maven
+RUN apt-get update
+RUN apt install -y maven
+ENV MAVEN_HOME=/opt/maven
+RUN export MAVEN_HOME
+
+#build file jar
+WORKDIR /home/spring_app/Customers
+RUN mvn package
+ARG status="build success !!!"
+RUN echo $status
+
+#run file jar
+WORKDIR /home/spring_app/Customers/target
+ENTRYPOINT ["java", "-jar"]
+CMD ["Demo_dockerfile.jar"]
+
+ONBUILD ARG demo="demo ONBUILD"
+ONBUILD RUN echo $demo
+VOLUME /home/spring_app/Customers/db
+EXPOSE 8080
